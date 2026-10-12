@@ -14,7 +14,7 @@ const FormPage = ({ title, description, backTo, backLabel, children }) => (
     <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{title}</h1>
     {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
 
-    <div className="mt-6 rounded-xl border border-line bg-white p-5 shadow-sm sm:p-6">
+    <div className="mt-6 rounded-2xl border border-line bg-white p-6 shadow-sm sm:p-7">
       {children}
     </div>
   </div>

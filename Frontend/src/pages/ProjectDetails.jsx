@@ -50,8 +50,8 @@ const BoardColumn = ({ column, tasks, renderCard }) => {
         <section
             ref={setNodeRef}
             aria-label={`${column.title} tasks`}
-            className={`min-h-48 min-w-[17rem] flex-1 rounded-xl p-2.5 transition-colors ${
-                isOver ? 'bg-brand-50 ring-2 ring-brand-200' : 'bg-slate-100/80'
+            className={`min-h-48 min-w-[17rem] flex-1 rounded-2xl border p-3 transition-colors ${
+                isOver ? 'border-brand-200 bg-brand-50 ring-2 ring-brand-200' : 'border-line bg-slate-100/80'
             }`}
         >
             <header className="flex items-center justify-between px-1.5 pb-2.5 pt-1">
@@ -187,7 +187,7 @@ const ProjectDetails = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Project header */}
             <div>
                 <Link
@@ -261,7 +261,7 @@ const ProjectDetails = () => {
                     role="region"
                     aria-label="Task board"
                     tabIndex={0}
-                    className="flex gap-4 overflow-x-auto pb-2"
+                    className="flex gap-4 overflow-x-auto rounded-2xl pb-3"
                 >
                     {COLUMNS.map((column) => (
                         <BoardColumn

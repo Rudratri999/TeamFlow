@@ -98,7 +98,7 @@ const Sidebar = ({ open, onClose }) => {
         }`}
       >
         {/* Brand */}
-        <div className="flex h-14 items-center justify-between border-b border-line px-4">
+        <div className="flex h-16 items-center justify-between border-b border-line px-4">
           <Link
             to={
               organizationId
@@ -108,10 +108,12 @@ const Sidebar = ({ open, onClose }) => {
             onClick={onClose}
             className="flex items-center gap-2.5 rounded-md"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
-              T
-            </span>
-            <span className="text-lg font-semibold tracking-tight text-slate-900">
+            <img
+              src="/teamflow-mark.svg"
+              alt=""
+              className="h-10 w-10"
+            />
+            <span className="text-xl font-semibold tracking-tight text-slate-900">
               TeamFlow
             </span>
           </Link>

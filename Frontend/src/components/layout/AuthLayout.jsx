@@ -13,10 +13,12 @@ const AuthLayout = ({ title, subtitle, footer, children }) => (
     {/* Brand panel (large screens only) */}
     <aside className="hidden w-[26rem] shrink-0 flex-col justify-between bg-brand-600 p-10 text-white lg:flex xl:w-[30rem]">
       <div className="flex items-center gap-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 text-base font-bold">
-          T
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fff] p-1">
+          <img src="/teamflow-mark.svg" alt="" className="h-full w-full" />
         </span>
-        <span className="text-xl font-semibold tracking-tight">TeamFlow</span>
+        <span className="text-xl font-semibold tracking-tight text-[#fff]">
+          TeamFlow
+        </span>
       </div>
 
       <div>
@@ -45,8 +47,8 @@ const AuthLayout = ({ title, subtitle, footer, children }) => (
       </div>
       <div className="w-full max-w-sm">
         <div className="mb-8 flex items-center gap-2.5 lg:hidden">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-base font-bold text-white">
-            T
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fff] p-1">
+            <img src="/teamflow-mark.svg" alt="" className="h-full w-full" />
           </span>
           <span className="text-xl font-semibold tracking-tight text-slate-900">
             TeamFlow
@@ -56,7 +58,7 @@ const AuthLayout = ({ title, subtitle, footer, children }) => (
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{title}</h1>
         <p className="mt-1.5 text-sm text-slate-500">{subtitle}</p>
 
-        <div className="mt-6 rounded-xl border border-line bg-white p-5 shadow-sm sm:p-6">
+        <div className="mt-6 rounded-2xl border border-line bg-white p-6 shadow-sm sm:p-7">
           {children}
         </div>
 

@@ -4,19 +4,37 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Brand (indigo) */
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
+  /* TeamFlow forest and teal identity */
+  --color-brand-50: #edf4f1;
+  --color-brand-100: #dbe9e4;
+  --color-brand-200: #bfd5cc;
+  --color-brand-500: #397568;
+  --color-brand-600: #173f35;
+  --color-brand-700: #12352d;
+  --color-accent: #d9a441;
+  --color-amber-50: #fbf5e7;
+  --color-amber-100: #f5eacd;
+  --color-amber-200: #eed9a7;
+  --color-amber-500: #d9a441;
+  --color-amber-600: #9d7124;
 
   /* Surfaces */
-  --color-canvas: #f7f8fa;
-  --color-line: #e5e7eb;
+  --color-canvas: #f5f5f0;
+  --color-line: #e3e7e2;
 
-  /* Task status (used by the board in a later step) */
+  /* Warm neutrals mapped onto the existing utility classes */
+  --color-slate-50: #fafbf8;
+  --color-slate-100: #f1f3ef;
+  --color-slate-200: #e3e7e2;
+  --color-slate-300: #d2d9d3;
+  --color-slate-400: #929b95;
+  --color-slate-500: #727b76;
+  --color-slate-600: #58635d;
+  --color-slate-700: #3e4943;
+  --color-slate-800: #2b3530;
+  --color-slate-900: #202824;
+
+  /* Task status remains separate from the brand palette */
   --color-status-todo: #64748b;
   --color-status-progress: #3b82f6;
   --color-status-done: #10b981;
@@ -40,9 +58,12 @@
   --color-slate-800: #e2e9e5;
   --color-slate-900: #f1f5f3;
 
-  --color-brand-50: #242641;
-  --color-brand-100: #30345a;
-  --color-brand-200: #454b78;
+  --color-brand-50: #1c3029;
+  --color-brand-100: #29443a;
+  --color-brand-200: #3a6253;
+  --color-brand-500: #6eaa99;
+  --color-brand-600: #397568;
+  --color-brand-700: #5b9a88;
   --color-red-50: #351f22;
   --color-red-100: #442629;
   --color-red-200: #673339;
@@ -74,7 +95,7 @@
 
   body {
     background-color: var(--color-canvas);
-    color: #0f172a;
+    color: var(--color-slate-900);
     -webkit-font-smoothing: antialiased;
   }
 
@@ -82,18 +103,24 @@
     outline: 2px solid var(--color-brand-500);
     outline-offset: 2px;
   }
+
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    border-color: var(--color-line);
+  }
 }
 
 @layer utilities {
   .dark .text-brand-500 {
-    color: #a5acff;
+    color: #82b8a8;
   }
 
   .dark .text-brand-600 {
-    color: #b0b6ff;
+    color: #91c4b4;
   }
 
   .dark .text-brand-700 {
-    color: #c1c5ff;
+    color: #a5d1c3;
   }
 }

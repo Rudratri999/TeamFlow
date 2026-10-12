@@ -107,12 +107,12 @@ const TopBar = ({ onMenuClick, menuOpen }) => {
   const { title, crumbs } = getPageContext(pathname)
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-line bg-white/90 px-4 backdrop-blur sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-line bg-canvas/90 px-4 backdrop-blur sm:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
         <button
           type="button"
           onClick={onMenuClick}
-          className="rounded-md p-1.5 text-slate-600 hover:bg-slate-100 lg:hidden"
+          className="rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 lg:hidden"
           aria-label="Open navigation"
           aria-controls="app-sidebar"
           aria-expanded={menuOpen}
@@ -150,7 +150,7 @@ const TopBar = ({ onMenuClick, menuOpen }) => {
       <div className="flex shrink-0 items-center gap-2">
         <div className="flex items-center gap-2">
           <span
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700 ring-1 ring-brand-200"
             aria-hidden="true"
           >
             {getInitials(user?.name)}
@@ -165,7 +165,7 @@ const TopBar = ({ onMenuClick, menuOpen }) => {
         <button
           type="button"
           onClick={logout}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
         >
           <LogOut size={15} />
           <span className="hidden sm:inline">Logout</span>

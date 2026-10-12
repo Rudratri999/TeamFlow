@@ -37,7 +37,7 @@ const ConfirmDialog = ({
         // A click on the backdrop targets the dialog element itself.
         if (event.target === ref.current && !pending) onCancel()
       }}
-      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl bg-white p-0 text-slate-900 shadow-xl backdrop:bg-slate-900/40"
+      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-line bg-white p-0 text-slate-900 shadow-xl backdrop:bg-slate-900/40"
     >
       <div className="p-6">
         <div className="flex gap-4">

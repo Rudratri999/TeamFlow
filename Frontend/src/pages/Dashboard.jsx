@@ -28,7 +28,7 @@ import { canManageOrganization } from '../utils/permissions'
 import { formatDate } from '../utils/formatDate'
 import { PriorityBadge, StatusBadge } from '../components/ui/TaskBadges'
 
-const cardClass = "rounded-xl border border-line bg-white shadow-sm"
+const cardClass = "rounded-2xl border border-line bg-white shadow-sm"
 
 const secondaryLinkClass =
   "inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
@@ -36,12 +36,12 @@ const secondaryLinkClass =
 /* ---------- Small building blocks ---------- */
 
 const StatItem = ({ label, value, icon: Icon }) => (
-  <div className="flex items-center gap-3 px-5 py-4">
-    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+  <div className={`${cardClass} flex items-center gap-4 p-5`}>
+    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
       <Icon size={18} aria-hidden="true" />
     </span>
     <div>
-      <p className="text-2xl font-semibold leading-none text-slate-900">{value}</p>
+      <p className="text-2xl font-semibold leading-none tracking-tight text-slate-900">{value}</p>
       <p className="mt-1 text-sm text-slate-500">{label}</p>
     </div>
   </div>
@@ -52,7 +52,7 @@ const DistributionCard = ({ title, items }) => {
   const total = items.reduce((sum, item) => sum + item.value, 0)
 
   return (
-    <section aria-label={title} className={`${cardClass} p-5`}>
+    <section aria-label={title} className={`${cardClass} p-5 sm:p-6`}>
       <div className="flex items-baseline justify-between">
         <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
         <span className="text-sm text-slate-500">{total} total</span>
@@ -180,7 +180,7 @@ const SearchGroup = ({ title, children }) => (
 )
 
 const DashboardSkeleton = () => (
-  <div className="space-y-6" aria-live="polite">
+  <div className="space-y-7" aria-live="polite">
     <div className="h-8 w-56 animate-pulse rounded bg-slate-200" />
     <div className="h-24 animate-pulse rounded-xl bg-slate-200/70" />
     <div className="grid gap-4 md:grid-cols-2">
@@ -245,14 +245,14 @@ const Dashboard = () => {
   const hasQuery = Boolean(searchQuery.trim())
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
             Organization overview
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-slate-500">
             A snapshot of your team's work and progress.
           </p>
         </div>
@@ -273,7 +273,7 @@ const Dashboard = () => {
           {canManage && (
             <Link
               to={`/projects/${organizationId}/create`}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700"
             >
               <Plus size={15} aria-hidden="true" /> Create Project
             </Link>
@@ -298,7 +298,7 @@ const Dashboard = () => {
             placeholder="Search tasks and projects..."
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            className="w-full rounded-xl border border-line bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+            className="w-full rounded-xl border border-line bg-white py-3 pl-10 pr-4 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
           />
         </div>
 
@@ -369,7 +369,7 @@ const Dashboard = () => {
       {/* Key numbers */}
       <section
         aria-label="Organization statistics"
-        className={`${cardClass} grid divide-y divide-line sm:grid-cols-3 sm:divide-x sm:divide-y-0`}
+        className="grid gap-3 sm:grid-cols-3"
       >
         <StatItem label="Members" value={data?.members ?? 0} icon={Users} />
         <StatItem label="Projects" value={data?.projects ?? 0} icon={FolderKanban} />
@@ -377,7 +377,9 @@ const Dashboard = () => {
       </section>
 
       {/* Status and priority */}
-      <section aria-label="Task summaries" className="grid gap-4 md:grid-cols-2">
+      <section aria-label="Task summaries" className="space-y-4">
+        <h2 className="text-lg font-semibold tracking-tight text-slate-900">Task overview</h2>
+        <div className="grid gap-4 md:grid-cols-2">
         <DistributionCard
           title="Tasks by status"
           items={[
@@ -394,11 +396,12 @@ const Dashboard = () => {
             { label: 'High', value: taskPriority?.high ?? 0, bar: 'bg-red-500' },
           ]}
         />
+        </div>
       </section>
 
       {/* Needs attention */}
       <section aria-label="Tasks needing attention">
-        <h2 className="mb-3 text-base font-semibold text-slate-900">Needs attention</h2>
+        <h2 className="mb-4 text-lg font-semibold tracking-tight text-slate-900">Needs attention</h2>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <TaskPanel
             title="Overdue Tasks"
@@ -434,7 +437,7 @@ const Dashboard = () => {
 
       {/* Recent activity */}
       <section aria-label="Recent activity">
-        <h2 className="mb-3 text-base font-semibold text-slate-900">Recent activity</h2>
+        <h2 className="mb-4 text-lg font-semibold tracking-tight text-slate-900">Recent activity</h2>
         <div className="grid gap-4 lg:grid-cols-2">
           <TaskPanel
             title="Recently Created Tasks"

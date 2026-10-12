@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 const PageMessage = ({ title, children, backTo, backLabel }) => (
   <div
     role="alert"
-    className="mx-auto max-w-lg rounded-xl border border-line bg-white p-6 text-center shadow-sm"
+    className="mx-auto max-w-lg rounded-2xl border border-line bg-white p-7 text-center shadow-sm"
   >
     <h1 className="text-base font-semibold text-slate-900">{title}</h1>
     {children && <p className="mt-2 text-sm text-slate-500">{children}</p>}

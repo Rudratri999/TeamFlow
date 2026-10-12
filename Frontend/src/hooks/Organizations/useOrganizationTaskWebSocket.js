@@ -63,8 +63,8 @@ export function useOrganizationTaskWebSocket() {
             }
 
             const websocketUrl = new URL(
-                `/ws/${encodeURIComponent(organizationId)}`,
-                api.defaults.baseURL
+                `${api.defaults.baseURL}/ws/${encodeURIComponent(organizationId)}`,
+                window.location.origin
             );
             websocketUrl.protocol =
                 websocketUrl.protocol === "https:" ? "wss:" : "ws:";
