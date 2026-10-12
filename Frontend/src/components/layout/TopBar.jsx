@@ -2,6 +2,7 @@ import { Fragment } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { ChevronRight, LogOut, Menu } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
+import ThemeToggle from "../ui/ThemeToggle"
 
 // Maps the current URL to a page title and breadcrumb trail.
 const getPageContext = (pathname) => {
@@ -158,6 +159,8 @@ const TopBar = ({ onMenuClick, menuOpen }) => {
             {user?.name}
           </span>
         </div>
+
+        <ThemeToggle />
 
         <button
           type="button"

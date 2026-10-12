@@ -1,4 +1,5 @@
 import { ClipboardCheck, FolderKanban, Users } from "lucide-react"
+import ThemeToggle from "../ui/ThemeToggle"
 
 const HIGHLIGHTS = [
   { icon: FolderKanban, text: "Plan projects on a shared Kanban board" },
@@ -38,7 +39,10 @@ const AuthLayout = ({ title, subtitle, footer, children }) => (
     </aside>
 
     {/* Form */}
-    <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6">
+    <main className="relative flex flex-1 items-center justify-center px-4 py-10 sm:px-6">
+      <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-sm">
         <div className="mb-8 flex items-center gap-2.5 lg:hidden">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-base font-bold text-white">

@@ -22,6 +22,51 @@
   --color-status-done: #10b981;
 }
 
+/* Dark surfaces reuse the existing Tailwind utilities throughout the app. */
+:root.dark {
+  color-scheme: dark;
+  --color-white: #192521;
+  --color-canvas: #111916;
+  --color-line: #2b3934;
+
+  --color-slate-50: #17211e;
+  --color-slate-100: #202c28;
+  --color-slate-200: #2b3934;
+  --color-slate-300: #3a4943;
+  --color-slate-400: #82918b;
+  --color-slate-500: #a4b0ab;
+  --color-slate-600: #c0cac5;
+  --color-slate-700: #d1dbd6;
+  --color-slate-800: #e2e9e5;
+  --color-slate-900: #f1f5f3;
+
+  --color-brand-50: #242641;
+  --color-brand-100: #30345a;
+  --color-brand-200: #454b78;
+  --color-red-50: #351f22;
+  --color-red-100: #442629;
+  --color-red-200: #673339;
+  --color-red-600: #ff8282;
+  --color-red-700: #ff9c9c;
+  --color-amber-50: #342b18;
+  --color-amber-100: #47391d;
+  --color-amber-200: #695326;
+  --color-amber-600: #f4c45d;
+  --color-amber-700: #fbd579;
+  --color-sky-50: #152634;
+  --color-sky-100: #20384a;
+  --color-sky-200: #34566d;
+  --color-sky-700: #8ecdf2;
+  --color-green-50: #192f25;
+  --color-green-100: #234332;
+  --color-green-200: #356147;
+  --color-green-700: #8bd4a3;
+  --color-emerald-50: #173027;
+  --color-emerald-100: #204638;
+  --color-emerald-200: #2e6750;
+  --color-emerald-700: #7cdbad;
+}
+
 @layer base {
   html {
     color-scheme: light;
@@ -36,5 +81,19 @@
   :focus-visible {
     outline: 2px solid var(--color-brand-500);
     outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .dark .text-brand-500 {
+    color: #a5acff;
+  }
+
+  .dark .text-brand-600 {
+    color: #b0b6ff;
+  }
+
+  .dark .text-brand-700 {
+    color: #c1c5ff;
   }
 }
