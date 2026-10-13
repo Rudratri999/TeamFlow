@@ -30,10 +30,10 @@ async def create_task(
             detail="Forbidden"
         )
 
-    if member.role not in ["admin", "owner"] and task.assignee_id is not None:
+    if member.role not in ["admin", "owner"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Members cannot assign tasks"
+            detail="Only organization owners and admins can create tasks"
         )
 
     project_exist = db.query(Project).filter(
@@ -139,16 +139,18 @@ async def update_task(
         )
 
     is_admin = member.role in ["admin", "owner"]
-    if not is_admin and task.assignee_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Members can only edit tasks assigned to themselves"
-        )
-    if not is_admin and "assignee_id" in update_task.model_fields_set:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Members cannot assign or unassign tasks"
-        )
+    if not is_admin:
+        if task.assignee_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Members can only edit tasks assigned to themselves"
+            )
+        disallowed_fields = set(update_task.model_fields_set) - {"title"}
+        if disallowed_fields:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Members can only edit task titles"
+            )
 
     # 4.If assignee_id is being changed, verify that the new assignee belongs to the organization.
     if "assignee_id" in update_task.model_fields_set:

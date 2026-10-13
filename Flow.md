@@ -36,6 +36,13 @@ Duplicate records → 409
 
 Invalid input → 422
 
+<!-- RBAC -->
+Organization task permissions:
+- Owners and admins can create, edit, and delete tasks, and assign or unassign tasks.
+- Members can view tasks they are authorized to access and edit only the title of tasks assigned to themselves.
+- Members cannot create or delete tasks, change task assignees, change priority, or update status through any request payload or assignment endpoint.
+- The backend derives the acting user's role from their organization membership; forbidden writes return 403 and do not commit or broadcast task updates.
+
 Backend validates/creates tokens.
 Frontend initiates the refresh flow.
 

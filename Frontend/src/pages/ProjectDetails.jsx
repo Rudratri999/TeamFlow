@@ -148,10 +148,8 @@ const ProjectDetails = () => {
 
     const totalTasks = tasks?.length ?? 0
 
-    // Same rule as the Edit Task page. The backend enforces it as well.
-    const canMoveTask = (task) =>
-        canManage ||
-        (membership?.user_id != null && task.assignee_id === membership.user_id)
+    // Members can only edit task titles; task status movement remains admin-only.
+    const canMoveTask = (task) => canManage
 
     const handleMove = (task, status) => {
         if (!canMoveTask(task) || task.status === status) return
@@ -239,13 +237,15 @@ const ProjectDetails = () => {
                     </p>
                 </div>
 
-                <Link
-                    to={`/project/${organization_id}/${projectId}/create`}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700"
-                >
-                    <Plus size={16} aria-hidden="true" />
-                    Create Task
-                </Link>
+                {canManage && (
+                    <Link
+                        to={`/project/${organization_id}/${projectId}/create`}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+                    >
+                        <Plus size={16} aria-hidden="true" />
+                        Create Task
+                    </Link>
+                )}
             </div>
 
             {/* Board: columns scroll horizontally when the screen is narrow */}

@@ -59,9 +59,7 @@ const UpdateTask = () => {
             return
         }
 
-        const memberTaskUpdate = { ...data }
-        delete memberTaskUpdate.assignee_id
-        updateTaskMutation.mutate(memberTaskUpdate)
+        updateTaskMutation.mutate({ title: data.title })
     }
 
     const projectPath = `/project/${organization_id}/${projectId}`
@@ -80,7 +78,7 @@ const UpdateTask = () => {
         )
     }
 
-    if (!canManage && task.assignee_id !== membership.user_id) {
+    if (!canManage && Number(task.assignee_id) !== Number(membership?.user_id)) {
         return (
             <PageMessage
                 title="Members can only edit tasks assigned to themselves."
@@ -90,10 +88,12 @@ const UpdateTask = () => {
         )
     }
 
+    const memberEditOnly = !canManage
+
     return (
         <FormPage
             title="Edit task"
-            description="Update the task's details, status and due date."
+            description={memberEditOnly ? "Update the task title." : "Update the task's details, status and due date."}
             backTo={projectPath}
             backLabel="Project"
         >
@@ -114,77 +114,80 @@ const UpdateTask = () => {
                     )}
                 </div>
 
-                <div>
-                    <label htmlFor="description" className={labelClass}>Description</label>
-                    <textarea
-                        id="description"
-                        rows={4}
-                        placeholder="Enter task description"
-                        aria-invalid={errors.description ? "true" : undefined}
-                        className={`${inputClass} mt-1.5`}
-                        {...register("description")}
-                    />
-                    {errors.description && (
-                        <p className={errorTextClass}>{errors.description.message}</p>
-                    )}
-                </div>
-
-                <div className="grid gap-5 sm:grid-cols-2">
-                    <div>
-                        <label htmlFor="status" className={labelClass}>Status</label>
-                        <select id="status" className={`${inputClass} mt-1.5`} {...register("status")}>
-                            <option value="todo">Todo</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="done">Done</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label htmlFor="priority" className={labelClass}>Priority</label>
-                        <select id="priority" className={`${inputClass} mt-1.5`} {...register("priority")}>
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div className="grid gap-5 sm:grid-cols-2">
-                    {canManage && (
+                {!memberEditOnly && (
+                    <>
                         <div>
-                            <label htmlFor="assignee_id" className={labelClass}>Assignee ID</label>
-                            <input
-                                id="assignee_id"
-                                type="number"
-                                min="1"
-                                step="1"
-                                placeholder="Optional"
-                                aria-invalid={errors.assignee_id ? "true" : undefined}
+                            <label htmlFor="description" className={labelClass}>Description</label>
+                            <textarea
+                                id="description"
+                                rows={4}
+                                placeholder="Enter task description"
+                                aria-invalid={errors.description ? "true" : undefined}
                                 className={`${inputClass} mt-1.5`}
-                                {...register("assignee_id")}
+                                {...register("description")}
                             />
-                            {errors.assignee_id && (
-                                <p className={errorTextClass}>{errors.assignee_id.message}</p>
+                            {errors.description && (
+                                <p className={errorTextClass}>{errors.description.message}</p>
                             )}
                         </div>
-                    )}
 
-                    <div>
-                        <label htmlFor="due_date" className={labelClass}>Due Date</label>
-                        <input
-                            id="due_date"
-                            type="date"
-                            aria-invalid={errors.due_date ? "true" : undefined}
-                            className={`${inputClass} mt-1.5`}
-                            {...register("due_date")}
-                        />
-                        {errors.due_date && (
-                            <p className={errorTextClass}>{errors.due_date.message}</p>
-                        )}
-                    </div>
-                </div>
+                        <div className="grid gap-5 sm:grid-cols-2">
+                            <div>
+                                <label htmlFor="status" className={labelClass}>Status</label>
+                                <select id="status" className={`${inputClass} mt-1.5`} {...register("status")}>
+                                    <option value="todo">Todo</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label htmlFor="priority" className={labelClass}>Priority</label>
+                                <select id="priority" className={`${inputClass} mt-1.5`} {...register("priority")}>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="grid gap-5 sm:grid-cols-2">
+                            <div>
+                                <label htmlFor="assignee_id" className={labelClass}>Assignee ID</label>
+                                <input
+                                    id="assignee_id"
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    placeholder="Optional"
+                                    aria-invalid={errors.assignee_id ? "true" : undefined}
+                                    className={`${inputClass} mt-1.5`}
+                                    {...register("assignee_id")}
+                                />
+                                {errors.assignee_id && (
+                                    <p className={errorTextClass}>{errors.assignee_id.message}</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label htmlFor="due_date" className={labelClass}>Due Date</label>
+                                <input
+                                    id="due_date"
+                                    type="date"
+                                    aria-invalid={errors.due_date ? "true" : undefined}
+                                    className={`${inputClass} mt-1.5`}
+                                    {...register("due_date")}
+                                />
+                                {errors.due_date && (
+                                    <p className={errorTextClass}>{errors.due_date.message}</p>
+                                )}
+                            </div>
+                        </div>
+                    </>
+                )}
 
                 {updateTaskMutation.isError && (
+                    
                     <FormError>
                         {getApiErrorMessage(
                             updateTaskMutation.error,

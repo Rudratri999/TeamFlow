@@ -1167,10 +1167,10 @@ async def update_status(
                   detail="Not Found"
             )
 
-      if member.role not in ["admin", "owner"] and task.assignee_id != current_user.id:
+      if member.role not in ["admin", "owner"]:
             raise HTTPException(
                   status_code=status.HTTP_403_FORBIDDEN,
-                  detail="Members can only update tasks assigned to themselves"
+                  detail="Members can only edit task titles"
             )
 
       task.status = status_update.status
@@ -1221,10 +1221,10 @@ async def update_priority(
                   detail="Not Found"
             )
 
-      if member.role not in ["admin", "owner"] and task.assignee_id != current_user.id:
+      if member.role not in ["admin", "owner"]:
             raise HTTPException(
                   status_code=status.HTTP_403_FORBIDDEN,
-                  detail="Members can only update tasks assigned to themselves"
+                  detail="Members can only edit task titles"
             )
 
       task.priority = priority_update.priority

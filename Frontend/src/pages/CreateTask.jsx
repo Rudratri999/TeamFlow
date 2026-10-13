@@ -7,7 +7,8 @@ import { useCreateTask } from "../hooks/Tasks/useCreateTask";
 import { getApiErrorMessage } from "../utils/getApiErrorMessage";
 import { useOrganizationMembership } from "../hooks/Organizations/useOrganizationMembers";
 import { canManageOrganization } from "../utils/permissions";
-import FormPage, { FormError } from "../components/ui/FormPage";
+import FormPage, { FormError, FormSkeleton } from "../components/ui/FormPage";
+import PageMessage from "../components/ui/PageMessage";
 import {
     errorTextClass,
     inputClass,
@@ -18,7 +19,10 @@ import {
 
 const CreateTask = () => {
     const { organization_id, projectId } = useParams();
-    const { data: membership } = useOrganizationMembership(organization_id);
+    const {
+        data: membership,
+        isPending: membershipLoading
+    } = useOrganizationMembership(organization_id);
     const canManage = canManageOrganization(membership?.role);
 
     const {
@@ -39,6 +43,20 @@ const CreateTask = () => {
     };
 
     const projectPath = `/project/${organization_id}/${projectId}`;
+
+    if (membershipLoading) {
+        return <FormSkeleton label="Loading permissions..." />;
+    }
+
+    if (!canManage) {
+        return (
+            <PageMessage
+                title="Only organization owners and admins can create tasks."
+                backTo={projectPath}
+                backLabel="Back to project"
+            />
+        );
+    }
 
     return (
         <FormPage

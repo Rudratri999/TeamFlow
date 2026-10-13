@@ -61,8 +61,11 @@ const TaskCard = ({
 }) => {
     const [confirmingDelete, setConfirmingDelete] = useState(false)
 
-    // Same rule as before: managers, or the person the task is assigned to.
-    const canEdit = canManage || task.assignee_id === currentUserId
+    // Members can edit only tasks assigned to themselves; admins can edit any task.
+    const isAssignedToCurrentUser =
+        task?.assignee_id != null &&
+        Number(task.assignee_id) === Number(currentUserId)
+    const canEdit = canManage || isAssignedToCurrentUser
 
     const assignee = members?.find((member) => member.user_id === task.assignee_id)
     const assigneeName =
@@ -188,7 +191,7 @@ const TaskCard = ({
 
                 {/* Non-drag way to change status. Always available to keyboard and
                     screen-reader users, and shown on touch devices. */}
-                {onMove && !isOverlay && (
+                {onMove && !isOverlay && canManage && (
                     <div className="sr-only mt-2.5 focus-within:not-sr-only pointer-coarse:not-sr-only">
                         <label className="flex items-center gap-2 text-xs text-slate-500">
                             <span className="shrink-0">Move to</span>

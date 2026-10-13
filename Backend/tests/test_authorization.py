@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 
-def test_member_permissions_and_my_projects(client):
+def test_member_permissions_and_my_projects(client, monkeypatch):
     owner_email = f"owner-{uuid4()}@example.com"
     owner_registration = client.post(
         "/auth/register",
@@ -90,6 +90,14 @@ def test_member_permissions_and_my_projects(client):
         "password": "password123"
     }).status_code == 200
 
+    from app.routers.websocket import manager
+    broadcast_events = []
+
+    async def capture_broadcast(*args):
+        broadcast_events.append(args)
+
+    monkeypatch.setattr(manager, "broadcast", capture_broadcast)
+
     assert client.get(
         f"/projects/organizations/{organization_id}/projects"
     ).status_code == 200
@@ -133,7 +141,7 @@ def test_member_permissions_and_my_projects(client):
             "priority": "low"
         }
     )
-    assert unassigned_task.status_code == 200
+    assert unassigned_task.status_code == 403
     assert client.post(
         f"/tasks/organizations/{organization_id}/projects/{project_id}/tasks",
         json={
@@ -145,12 +153,41 @@ def test_member_permissions_and_my_projects(client):
         }
     ).status_code == 403
 
+    assert broadcast_events == []
+    current_project_tasks = client.get(
+        f"/tasks/organizations/{organization_id}/projects/{project_id}/tasks"
+    )
+    assert {task["id"] for task in current_project_tasks.json()} == {
+        first_member_task.json()["id"],
+        second_member_task.json()["id"]
+    }
+
     assert client.put(
         f"/tasks/organizations/{organization_id}/projects/{project_id}/tasks/{first_member_task.json()['id']}",
         json={"title": "Member updated own task"}
     ).status_code == 200
+
+    broadcast_events.clear()
+
+    task_url = (
+        f"/tasks/organizations/{organization_id}/projects/{project_id}/tasks/"
+        f"{first_member_task.json()['id']}"
+    )
+    rejected_mass_assignment = client.put(
+        task_url,
+        json={
+            "title": "Unauthorized title change",
+            "assignee_id": owner_registration.json()["id"]
+        }
+    )
+    assert rejected_mass_assignment.status_code == 403
+    unchanged_task = client.get(task_url)
+    assert unchanged_task.status_code == 200
+    assert unchanged_task.json()["title"] == "Member updated own task"
+    assert unchanged_task.json()["assignee_id"] == member_id
+
     assert client.put(
-        f"/tasks/organizations/{organization_id}/projects/{project_id}/tasks/{first_member_task.json()['id']}",
+        task_url,
         json={"assignee_id": None}
     ).status_code == 403
     assert client.put(
@@ -160,7 +197,8 @@ def test_member_permissions_and_my_projects(client):
     assert client.patch(
         f"/organizations/organizations/{organization_id}/projects/{project_id}/tasks/{first_member_task.json()['id']}/status",
         json={"status": "done"}
-    ).status_code == 200
+    ).status_code == 403
+    broadcast_events.clear()
     assert client.patch(
         f"/organizations/organizations/{organization_id}/projects/{second_project_id}/tasks/{owner_task.json()['id']}/priority",
         json={"priority": "high"}
@@ -179,6 +217,129 @@ def test_member_permissions_and_my_projects(client):
     assert client.get(
         f"/organizations/organizations/{organization_id}/users/{owner_registration.json()['id']}/tasks"
     ).status_code == 403
+    assert broadcast_events == []
+
+    current_project_tasks = client.get(
+        f"/tasks/organizations/{organization_id}/projects/{project_id}/tasks"
+    )
+    assert {task["id"] for task in current_project_tasks.json()} == {
+        first_member_task.json()["id"],
+        second_member_task.json()["id"]
+    }
+
+
+def test_admin_retains_task_management_permissions(client):
+    owner_email = f"task-admin-owner-{uuid4()}@example.com"
+    owner = client.post(
+        "/auth/register",
+        json={
+            "name": "Task Admin Test Owner",
+            "email": owner_email,
+            "password": "password123"
+        }
+    )
+    assert owner.status_code == 200
+    assert client.post(
+        "/auth/login",
+        json={"email": owner_email, "password": "password123"}
+    ).status_code == 200
+
+    organization = client.post(
+        "/organizations/create-organization",
+        json={"name": "Task Admin Permissions"}
+    )
+    assert organization.status_code == 200
+    organization_id = organization.json()["id"]
+
+    admin_email = f"task-admin-{uuid4()}@example.com"
+    admin = client.post(
+        "/auth/register",
+        json={
+            "name": "Task Admin",
+            "email": admin_email,
+            "password": "password123"
+        }
+    )
+    assert admin.status_code == 200
+    admin_id = admin.json()["id"]
+    assert client.post(
+        f"/organizations/organizations/{organization_id}/members",
+        json={"user_id": admin_id}
+    ).status_code == 200
+    assert client.patch(
+        f"/organizations/organizations/{organization_id}/members/{admin_id}/role",
+        json={"role": "admin"}
+    ).status_code == 200
+
+    assignee_email = f"task-admin-assignee-{uuid4()}@example.com"
+    assignee = client.post(
+        "/auth/register",
+        json={
+            "name": "Task Admin Assignee",
+            "email": assignee_email,
+            "password": "password123"
+        }
+    )
+    assert assignee.status_code == 200
+    assignee_id = assignee.json()["id"]
+    assert client.post(
+        f"/organizations/organizations/{organization_id}/members",
+        json={"user_id": assignee_id}
+    ).status_code == 200
+
+    assert client.post("/auth/logout").status_code == 200
+    assert client.post(
+        "/auth/login",
+        json={"email": admin_email, "password": "password123"}
+    ).status_code == 200
+
+    project = client.post(
+        f"/projects/organizations/{organization_id}/projects",
+        json={
+            "name": "Admin-created project",
+            "organization_id": organization_id
+        }
+    )
+    assert project.status_code == 200
+    project_id = project.json()["id"]
+
+    task = client.post(
+        f"/tasks/organizations/{organization_id}/projects/{project_id}/tasks",
+        json={
+            "project_id": project_id,
+            "title": "Admin-created task",
+            "status": "todo",
+            "priority": "medium",
+            "assignee_id": assignee_id
+        }
+    )
+    assert task.status_code == 200
+    task_id = task.json()["id"]
+
+    assign = client.patch(
+        f"/organizations/organizations/{organization_id}/projects/{project_id}/task/{task_id}/assignee",
+        json={"user_id": admin_id}
+    )
+    assert assign.status_code == 200
+    assert assign.json()["assignee_id"] == admin_id
+
+    unassign = client.patch(
+        f"/organizations/organizations/{organization_id}/projects/{project_id}/tasks/{task_id}/unassign"
+    )
+    assert unassign.status_code == 200
+    assert unassign.json()["assignee_id"] is None
+
+    update = client.put(
+        f"/tasks/organizations/{organization_id}/projects/{project_id}/tasks/{task_id}",
+        json={"title": "Admin-updated task"}
+    )
+    assert update.status_code == 200
+    assert update.json()["title"] == "Admin-updated task"
+
+    delete = client.delete(
+        f"/tasks/organizations/{organization_id}/projects/{project_id}/tasks/{task_id}"
+    )
+    assert delete.status_code == 200
 
 
 def test_member_cannot_read_task_from_another_organization(client):
