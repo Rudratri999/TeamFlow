@@ -4,8 +4,12 @@ import { Link, useParams } from "react-router-dom"
 import { taskUpdateSchema } from '../validation/taskSchema'
 import { useUpdateTask } from '../hooks/Tasks/useUpdateTask'
 import { useTask } from '../hooks/Tasks/useTask'
-import { useOrganizationMembership } from '../hooks/Organizations/useOrganizationMembers'
+import {
+    useOrganizationMembership,
+    useOrganizationMembersDetail
+} from '../hooks/Organizations/useOrganizationMembers'
 import { canManageOrganization } from '../utils/permissions'
+import { getMemberName } from '../utils/memberName'
 import { getApiErrorMessage } from '../utils/getApiErrorMessage'
 import FormPage, { FormError, FormSkeleton } from '../components/ui/FormPage'
 import PageMessage from '../components/ui/PageMessage'
@@ -23,6 +27,11 @@ const UpdateTask = () => {
         data: membership,
         isPending: membershipLoading
     } = useOrganizationMembership(organization_id)
+    const {
+        data: members,
+        isPending: membersLoading,
+        isError: membersError
+    } = useOrganizationMembersDetail(organization_id)
     const canManage = canManageOrganization(membership?.role)
 
     const {
@@ -42,7 +51,7 @@ const UpdateTask = () => {
             description: task?.description || "",
             status: task?.status || "todo",
             priority: task?.priority || "medium",
-            assignee_id: task?.assignee_id ?? "",
+            assignee_id: String(task?.assignee_id ?? ""),
             due_date: task?.due_date || ""
         }
     })
@@ -64,14 +73,14 @@ const UpdateTask = () => {
 
     const projectPath = `/project/${organization_id}/${projectId}`
 
-    if (membershipLoading || taskLoading) {
+    if (membershipLoading || taskLoading || membersLoading) {
         return <FormSkeleton label="Loading task..." />
     }
 
-    if (taskError) {
+    if (taskError || membersError) {
         return (
             <PageMessage
-                title="Couldn't load task."
+                title={taskError ? "Couldn't load task." : "Couldn't load organization members."}
                 backTo={projectPath}
                 backLabel="Back to project"
             />
@@ -153,17 +162,20 @@ const UpdateTask = () => {
 
                         <div className="grid gap-5 sm:grid-cols-2">
                             <div>
-                                <label htmlFor="assignee_id" className={labelClass}>Assignee ID</label>
-                                <input
+                                <label htmlFor="assignee_id" className={labelClass}>Assignee</label>
+                                <select
                                     id="assignee_id"
-                                    type="number"
-                                    min="1"
-                                    step="1"
-                                    placeholder="Optional"
                                     aria-invalid={errors.assignee_id ? "true" : undefined}
                                     className={`${inputClass} mt-1.5`}
                                     {...register("assignee_id")}
-                                />
+                                >
+                                    <option value="">Unassigned</option>
+                                    {members?.map((member) => (
+                                        <option key={member.user_id} value={member.user_id}>
+                                            {getMemberName(member)}
+                                        </option>
+                                    ))}
+                                </select>
                                 {errors.assignee_id && (
                                     <p className={errorTextClass}>{errors.assignee_id.message}</p>
                                 )}

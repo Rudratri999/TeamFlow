@@ -149,7 +149,7 @@ const ProjectDetails = () => {
     const totalTasks = tasks?.length ?? 0
 
     // Members can only edit task titles; task status movement remains admin-only.
-    const canMoveTask = (task) => canManage
+    const canMoveTask = () => canManage
 
     const handleMove = (task, status) => {
         if (!canMoveTask(task) || task.status === status) return

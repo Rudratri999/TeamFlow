@@ -135,6 +135,57 @@ def test_get_organization_members(client):
 
     assert response.status_code == 200
 
+
+def test_get_organization_members_detail_includes_user_names(client):
+    owner_email = f"member-details-owner-{uuid4()}@example.com"
+    owner = client.post(
+        "/auth/register",
+        json={
+            "name": "Member Details Owner",
+            "email": owner_email,
+            "password": "password123"
+        }
+    )
+    assert owner.status_code == 200
+    assert client.post(
+        "/auth/login",
+        json={"email": owner_email, "password": "password123"}
+    ).status_code == 200
+
+    organization = client.post(
+        "/organizations/create-organization",
+        json={"name": "Member Details Organization"}
+    )
+    assert organization.status_code == 200
+    organization_id = organization.json()["id"]
+
+    member = client.post(
+        "/auth/register",
+        json={
+            "name": "Named Dropdown Member",
+            "email": f"named-member-{uuid4()}@example.com",
+            "password": "password123"
+        }
+    )
+    assert member.status_code == 200
+    assert client.post(
+        f"/organizations/organizations/{organization_id}/members",
+        json={"user_id": member.json()["id"]}
+    ).status_code == 200
+
+    response = client.get(
+        f"/organizations/organizations/{organization_id}/members/details"
+    )
+
+    assert response.status_code == 200
+    named_member = next(
+        row for row in response.json()
+        if row["user_id"] == member.json()["id"]
+    )
+    assert named_member["user"]["name"] == "Named Dropdown Member"
+    assert named_member["user"]["email"] == member.json()["email"]
+    assert "password" not in named_member["user"]
+
 # ----------- Test Add member -------------
 # def test_add_member_to_org(client):
 #     client.post(

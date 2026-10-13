@@ -620,16 +620,32 @@ def get_user_detail(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Forbidden"
             )   
-    #   So User is needed because the endpoint is specifically for member details.
-      get_membership = db.query(Membership).join(User).filter(
-           Membership.organization_id == organization_id,
+      memberships = db.query(Membership, User).join(
+           User,
+           Membership.user_id == User.id
+      ).filter(
+           Membership.organization_id == organization_id
       ).all()
-      if not get_membership:
+      if not memberships:
            raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Not Found"
            )
-      return get_membership
+      return [
+           {
+                "id": member.id,
+                "user_id": member.user_id,
+                "organization_id": member.organization_id,
+                "role": member.role,
+                "created_at": member.created_at,
+                "user": {
+                     "id": user.id,
+                     "name": user.name,
+                     "email": user.email
+                }
+           }
+           for member, user in memberships
+      ]
 
 
 # ------------------ Get Tasks Assigned to a Specific User------------------------------

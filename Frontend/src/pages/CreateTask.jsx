@@ -5,8 +5,12 @@ import { Link, useParams } from "react-router-dom";
 import { taskCreateSchema } from "../validation/taskSchema";
 import { useCreateTask } from "../hooks/Tasks/useCreateTask";
 import { getApiErrorMessage } from "../utils/getApiErrorMessage";
-import { useOrganizationMembership } from "../hooks/Organizations/useOrganizationMembers";
+import {
+    useOrganizationMembership,
+    useOrganizationMembersDetail
+} from "../hooks/Organizations/useOrganizationMembers";
 import { canManageOrganization } from "../utils/permissions";
+import { getMemberName } from "../utils/memberName";
 import FormPage, { FormError, FormSkeleton } from "../components/ui/FormPage";
 import PageMessage from "../components/ui/PageMessage";
 import {
@@ -23,6 +27,11 @@ const CreateTask = () => {
         data: membership,
         isPending: membershipLoading
     } = useOrganizationMembership(organization_id);
+    const {
+        data: members,
+        isPending: membersLoading,
+        isError: membersError
+    } = useOrganizationMembersDetail(organization_id);
     const canManage = canManageOrganization(membership?.role);
 
     const {
@@ -30,7 +39,10 @@ const CreateTask = () => {
         handleSubmit,
         formState: { errors }
     } = useForm({
-        resolver: zodResolver(taskCreateSchema)
+        resolver: zodResolver(taskCreateSchema),
+        defaultValues: {
+            assignee_id: ""
+        }
     });
 
     const createTaskMutation = useCreateTask(
@@ -44,8 +56,18 @@ const CreateTask = () => {
 
     const projectPath = `/project/${organization_id}/${projectId}`;
 
-    if (membershipLoading) {
+    if (membershipLoading || membersLoading) {
         return <FormSkeleton label="Loading permissions..." />;
+    }
+
+    if (membersError) {
+        return (
+            <PageMessage
+                title="Couldn't load organization members."
+                backTo={projectPath}
+                backLabel="Back to project"
+            />
+        );
     }
 
     if (!canManage) {
@@ -120,17 +142,20 @@ const CreateTask = () => {
                 <div className="grid gap-5 sm:grid-cols-2">
                     {canManage && (
                         <div>
-                            <label htmlFor="assignee_id" className={labelClass}>Assignee ID</label>
-                            <input
+                            <label htmlFor="assignee_id" className={labelClass}>Assignee</label>
+                            <select
                                 id="assignee_id"
-                                type="number"
-                                min="1"
-                                step="1"
-                                placeholder="Optional"
                                 aria-invalid={errors.assignee_id ? "true" : undefined}
                                 className={`${inputClass} mt-1.5`}
                                 {...register("assignee_id")}
-                            />
+                            >
+                                <option value="">Unassigned</option>
+                                {members?.map((member) => (
+                                    <option key={member.user_id} value={member.user_id}>
+                                        {getMemberName(member)}
+                                    </option>
+                                ))}
+                            </select>
                             {errors.assignee_id && (
                                 <p className={errorTextClass}>{errors.assignee_id.message}</p>
                             )}
